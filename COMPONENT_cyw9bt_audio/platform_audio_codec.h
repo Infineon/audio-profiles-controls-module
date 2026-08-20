@@ -1,0 +1,85 @@
+/*
+ * $ Copyright 2016-YEAR Cypress Semiconductor $
+ */
+
+/**
+ * @file
+ *
+ * GPIO-based Button APIs
+ */
+
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "wiced.h"
+#include"data_types.h"
+#include <internal/platform_audio_device.h>
+#include "wiced_rtos.h"
+#include"wiced_hal_gpio.h"
+
+
+/******************************************************
+ *                     Macros
+ ******************************************************/
+
+/******************************************************
+ *                    Constants
+ ******************************************************/
+
+/******************************************************
+ *                   Enumerations
+ ******************************************************/
+
+/******************************************************
+ *                 Type Definitions
+ ******************************************************/
+/**
+ * Platform audio device interface
+ */
+typedef struct{
+	uint32_t        i2c_speed;	 /**< speed mode the device operates in */
+	uint8_t 	    i2c_pin_scl;
+	uint8_t 		i2c_pin_sda;
+	uint8_t         i2s_mode;	/*0=slave 1=master*/
+	uint8_t         i2s_pin_sclk;
+	uint8_t         i2s_pin_ws;
+	uint8_t         i2s_pin_din;
+	uint8_t         i2s_pin_dout;
+	uint8_t 	    pin_reset;
+}platform_audio_port;
+
+typedef struct
+{
+	wiced_result_t (*audio_device_init)            ( platform_audio_port* data_port );
+    wiced_result_t (*audio_device_deinit)          ( void* device_data );
+    wiced_result_t (*audio_device_configure)       ( void* device_data, platform_audio_config_t* config );
+    wiced_result_t (*audio_device_start_streaming) ( void* device_data );
+    wiced_result_t (*audio_device_stop_streaming)  ( void* device_data );
+    wiced_result_t (*audio_device_set_sr)          ( void* device_data, int32_t sr );
+    wiced_result_t (*audio_device_set_sink)        ( void* device_data, platform_audio_io_device_t sink );
+    wiced_result_t (*audio_device_set_volume)      ( void* device_data, int32_t volume_level );
+    wiced_result_t (*audio_device_set_mic_gain)    ( void* device_data, int32_t volume_level );
+    wiced_result_t (*audio_device_get_volume)      ( void* device_data, int32_t *volume_level );
+    wiced_result_t (*audio_device_get_volume_range)( void* device_data, int32_t* min_volume_levels, int32_t* max_volume_levels);
+    wiced_result_t (*audio_device_ioctl)           ( void* device_data, platform_audio_device_ioctl_t cmd, platform_audio_device_ioctl_data_t* cmd_data );
+} platform_audio_device_ops;
+
+
+typedef struct
+{
+    platform_audio_device_id_t  device_id;
+    platform_audio_device_ops* device_ops;
+    platform_audio_port* device_port;
+} platform_audio_device_interface_t;
+
+enum{
+    I2S_SLAVE,
+    I2S_MASTER,
+};
+
+#ifdef __cplusplus
+} /*extern "C" */
+#endif
